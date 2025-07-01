@@ -21,10 +21,8 @@ const [project, setProject] = useState(null);
   const [updates, setUpdates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [showReportPreview, setShowReportPreview] = useState(false);
+const [showReportPreview, setShowReportPreview] = useState(false);
   const [editingAccessInstructions, setEditingAccessInstructions] = useState(false);
-  const [accessInstructions, setAccessInstructions] = useState('');
-const [editingAccessInstructions, setEditingAccessInstructions] = useState(false);
   const [accessInstructions, setAccessInstructions] = useState('');
   
   // Initialize access instructions when project loads
