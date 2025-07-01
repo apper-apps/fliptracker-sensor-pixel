@@ -58,8 +58,8 @@ const UpdateCard = ({ update, project, onDelete }) => {
         </button>
       </div>
       
-      {/* Description */}
-      {update.description && (
+{/* Description */}
+      {update.description && update.description.trim() && (
         <p className="text-gray-700 mb-4 leading-relaxed">
           {update.description}
         </p>

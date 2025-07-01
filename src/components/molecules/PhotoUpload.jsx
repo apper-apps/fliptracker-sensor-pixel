@@ -79,28 +79,28 @@ const PhotoUpload = ({ onPhotosChange, photos = [], maxPhotos = 10 }) => {
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
-      >
+>
         <div className="space-y-4">
-          <div className="flex justify-center space-x-4">
+          <div className="flex justify-center space-x-2">
             <Button
               variant="primary"
               icon="Camera"
               onClick={openCamera}
-              className="flex-1 sm:flex-none"
+              className="flex-1 sm:flex-none text-base py-3 px-6"
             >
-              Take Photo
+              📷 Take Photo
             </Button>
-            <Button
+<Button
               variant="secondary"
               icon="Upload"
               onClick={openGallery}
-              className="flex-1 sm:flex-none"
+              className="flex-1 sm:flex-none py-3 px-6"
             >
-              Upload
+              📁 Gallery
             </Button>
           </div>
-          <p className="text-sm text-gray-500">
-            Or drag and drop photos here
+<p className="text-sm text-gray-500">
+            Or drag and drop photos here • Capture progress instantly
           </p>
           <p className="text-xs text-gray-400">
             {photos.length}/{maxPhotos} photos added

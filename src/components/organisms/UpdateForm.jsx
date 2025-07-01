@@ -27,7 +27,6 @@ const UpdateForm = () => {
     'After',
     'Milestone'
   ]
-  
   useEffect(() => {
     // Load last selected project from localStorage
     const lastProjectId = localStorage.getItem('lastSelectedProject')
@@ -57,7 +56,7 @@ const UpdateForm = () => {
     localStorage.setItem('lastSelectedProject', project.Id.toString())
   }
   
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault()
     
     if (!selectedProject) {
@@ -65,16 +64,10 @@ const UpdateForm = () => {
       return
     }
     
-    if (!formData.title.trim()) {
-      toast.error('Please enter a title')
-      return
-    }
-    
     if (photos.length === 0) {
       toast.error('Please add at least one photo')
       return  
     }
-    
     setLoading(true)
     
     try {
@@ -87,9 +80,9 @@ const UpdateForm = () => {
         takenAt: new Date().toISOString()
       }))
       
-      const updateData = {
+const updateData = {
         projectId: selectedProject.Id,
-        title: formData.title,
+        title: formData.title.trim() || 'Photo Update',
         description: formData.description,
         category: formData.category,
         photos: processedPhotos,
@@ -128,7 +121,7 @@ const UpdateForm = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Project Selection */}
+{/* Project Selection */}
       <div>
         <label className="block text-sm font-semibold text-gray-700 mb-2">
           Project
@@ -139,38 +132,10 @@ const UpdateForm = () => {
         />
       </div>
       
-      {/* Title */}
-      <Input
-        label="Update Title"
-        type="text"
-        placeholder="e.g., Kitchen demo completed"
-        value={formData.title}
-        onChange={(e) => handleInputChange('title', e.target.value)}
-        icon="Type"
-      />
-      
-      {/* Category */}
+      {/* Photos - Primary Section */}
       <div>
         <label className="block text-sm font-semibold text-gray-700 mb-2">
-          Category
-        </label>
-        <select
-          value={formData.category}
-          onChange={(e) => handleInputChange('category', e.target.value)}
-          className="input-field"
-        >
-          {categories.map(category => (
-            <option key={category} value={category}>
-              {category}
-            </option>
-          ))}
-        </select>
-      </div>
-      
-      {/* Photos */}
-      <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-2">
-          Photos
+          Photos <span className="text-red-500">*</span>
         </label>
         <PhotoUpload
           photos={photos}
@@ -179,6 +144,40 @@ const UpdateForm = () => {
         />
       </div>
       
+      {/* Text Updates - Optional Section */}
+      <div className="border-t border-gray-200 pt-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          Additional Details (Optional)
+        </h3>
+        
+        {/* Category */}
+        <div className="mb-4">
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            Category
+          </label>
+          <select
+            value={formData.category}
+            onChange={(e) => handleInputChange('category', e.target.value)}
+            className="input-field"
+          >
+            {categories.map(category => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
+        </div>
+        
+        {/* Title */}
+        <Input
+          label="Update Title (Optional)"
+          type="text"
+          placeholder="e.g., Kitchen demo completed"
+          value={formData.title}
+          onChange={(e) => handleInputChange('title', e.target.value)}
+          icon="Type"
+        />
+      </div>
       {/* Description */}
       <div>
         <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -205,9 +204,9 @@ const UpdateForm = () => {
         </Button>
         <Button
           type="submit"
-          variant="primary"
+variant="primary"
           loading={loading}
-          disabled={!selectedProject || !formData.title.trim() || photos.length === 0}
+          disabled={!selectedProject || photos.length === 0}
           className="flex-1"
         >
           Post Update

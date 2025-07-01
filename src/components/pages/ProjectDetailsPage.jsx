@@ -126,12 +126,12 @@ const ProjectDetailsPage = () => {
             <h2 className="text-lg font-semibold text-gray-900">
               Project Updates
             </h2>
-            <Button
+<Button
               variant="primary"
               icon="Camera"
               onClick={handleNewUpdate}
             >
-              Add Update
+              📷 Take Photos
             </Button>
           </div>
           
