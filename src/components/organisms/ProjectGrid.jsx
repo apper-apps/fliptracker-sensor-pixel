@@ -17,13 +17,21 @@ const ProjectGrid = ({ groupByStatus = false }) => {
     loadProjects()
   }, [])
   
-  const loadProjects = async () => {
+const loadProjects = async () => {
     setLoading(true)
     setError('')
     try {
       const data = await projectService.getAll()
-      setProjects(data)
+      // Filter out invalid projects to prevent ProjectCard errors
+      const validProjects = (data || []).filter(project => 
+        project && 
+        typeof project === 'object' && 
+        project.Id !== undefined &&
+        project.Id !== null
+      )
+      setProjects(validProjects)
     } catch (err) {
+      console.error('Project loading error:', err)
       setError('Failed to load projects. Please try again.')
     } finally {
       setLoading(false)
@@ -39,9 +47,12 @@ const ProjectGrid = ({ groupByStatus = false }) => {
     'Sold'
   ]
 
-  const groupProjectsByStatus = (projects) => {
+const groupProjectsByStatus = (projects) => {
     const grouped = statusOrder.reduce((acc, status) => {
-      acc[status] = projects.filter(project => project.status === status)
+      acc[status] = (projects || []).filter(project => 
+        project && 
+        project.status === status
+      )
       return acc
     }, {})
     return grouped
