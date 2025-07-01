@@ -1,64 +1,81 @@
-import React, { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { format } from 'date-fns'
-import Badge from '@/components/atoms/Badge'
-import Button from '@/components/atoms/Button'
-import UpdateCard from '@/components/molecules/UpdateCard'
-import Loading from '@/components/ui/Loading'
-import Error from '@/components/ui/Error'
-import Empty from '@/components/ui/Empty'
-import ApperIcon from '@/components/ApperIcon'
-import ReportPreview from '@/components/molecules/ReportPreview'
-import { projectService } from '@/services/api/projectService'
-import { updateService } from '@/services/api/updateService'
-import { toast } from 'react-toastify'
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { motion } from "framer-motion";
+import { format } from "date-fns";
+import { toast } from "react-toastify";
+import ApperIcon from "@/components/ApperIcon";
+import Badge from "@/components/atoms/Badge";
+import Button from "@/components/atoms/Button";
+import UpdateCard from "@/components/molecules/UpdateCard";
+import ReportPreview from "@/components/molecules/ReportPreview";
+import Error from "@/components/ui/Error";
+import Empty from "@/components/ui/Empty";
+import Loading from "@/components/ui/Loading";
+import { projectService } from "@/services/api/projectService";
+import { updateService } from "@/services/api/updateService";
 
 const ProjectDetailsPage = () => {
-  const { id } = useParams()
-  const navigate = useNavigate()
-  const [project, setProject] = useState(null)
-  const [updates, setUpdates] = useState([])
-const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [showReportPreview, setShowReportPreview] = useState(false)
-  const [editingAccessInstructions, setEditingAccessInstructions] = useState(false)
-  const [accessInstructions, setAccessInstructions] = useState('')
+  const { id } = useParams();
+  const navigate = useNavigate();
+const [project, setProject] = useState(null);
+  const [updates, setUpdates] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [showReportPreview, setShowReportPreview] = useState(false);
+  const [editingAccessInstructions, setEditingAccessInstructions] = useState(false);
+  const [accessInstructions, setAccessInstructions] = useState('');
+const [editingAccessInstructions, setEditingAccessInstructions] = useState(false);
+  const [accessInstructions, setAccessInstructions] = useState('');
   
+  // Initialize access instructions when project loads
   useEffect(() => {
-    loadProjectData()
-  }, [id])
+    if (project?.accessInstructions) {
+      setAccessInstructions(project.accessInstructions);
+    }
+  }, [project]);
+useEffect(() => {
+    loadProjectData();
+  }, [id]);
   
-  const loadProjectData = async () => {
-    setLoading(true)
-    setError('')
+const loadProjectData = async () => {
+    setLoading(true);
+    setError('');
     try {
       const [projectData, updatesData] = await Promise.all([
         projectService.getById(parseInt(id)),
         updateService.getAll()
-])
+      ]);
       
-      setProject(projectData)
-      setAccessInstructions(projectData.accessInstructions || '')
-      // Filter updates for this project
-      const projectUpdates = updatesData.filter(update => update.projectId === projectData.Id)
-      setUpdates(projectUpdates)
-    } catch (err) {
-      setError('Failed to load project details. Please try again.')
-    } finally {
-      setLoading(false)
-    }
-  }
-  
-  const handleDeleteUpdate = async (updateId) => {
-    try {
-      await updateService.delete(updateId)
-      setUpdates(prev => prev.filter(update => update.Id !== updateId))
-      toast.success('Update deleted successfully')
+      // Validate project data exists
+      if (!projectData) {
+        throw new Error('Project not found');
+      }
+      
+      // Filter updates for this project - handle both id and Id properties
+      const projectId = projectData.id || projectData.Id;
+      const projectUpdates = updatesData?.filter(update => 
+        update.projectId === projectId || update.projectId === String(projectId)
+      ) || [];
+      
+      setUpdates(projectUpdates);
+      setProject(projectData);
     } catch (error) {
-      toast.error('Failed to delete update')
+      console.error('Failed to load project data:', error);
+      setError(error.message || 'Failed to load project data');
+    } finally {
+      setLoading(false);
     }
-  }
+  };
+  
+const handleDeleteUpdate = async (updateId) => {
+    try {
+      await updateService.delete(updateId);
+      setUpdates(prev => prev.filter(update => update.Id !== updateId));
+      toast.success('Update deleted successfully');
+    } catch (error) {
+      toast.error('Failed to delete update');
+    }
+  };
   
 const getStatusVariant = (status) => {
     const statusMap = {
@@ -68,52 +85,52 @@ const getStatusVariant = (status) => {
       'Finishes & Final': 'finishing',
       'On-Market': 'market',
       'Sold': 'completed'
-    }
-    return statusMap[status] || 'default'
-  }
+    };
+    return statusMap[status] || 'default';
+  };
 
-  const statusOptions = [
+const statusOptions = [
     'Planning & Permits',
     'Demo & Structural', 
     'Systems & Rough-In',
     'Finishes & Final',
     'On-Market',
     'Sold'
-  ]
+  ];
 
-  const handleStatusChange = async (newStatus) => {
+const handleStatusChange = async (newStatus) => {
     try {
-      const updatedProject = await projectService.update(project.Id, { status: newStatus })
-      setProject(updatedProject)
-      toast.success('Project status updated successfully')
+      const updatedProject = await projectService.update(project.Id, { status: newStatus });
+      setProject(updatedProject);
+      toast.success('Project status updated successfully');
     } catch (error) {
-      toast.error('Failed to update project status')
+      toast.error('Failed to update project status');
     }
-}
+  };
 
-  const handleAccessInstructionsUpdate = async () => {
+const handleAccessInstructionsUpdate = async () => {
     try {
-      const updatedProject = await projectService.update(project.Id, { accessInstructions })
-      setProject(updatedProject)
-      setEditingAccessInstructions(false)
-      toast.success('Access instructions updated successfully')
+      const updatedProject = await projectService.update(project.Id, { accessInstructions });
+      setProject(updatedProject);
+      setEditingAccessInstructions(false);
+      toast.success('Access instructions updated successfully');
     } catch (error) {
-      toast.error('Failed to update access instructions')
+      toast.error('Failed to update access instructions');
     }
-  }
+  };
   
-  const handleNewUpdate = () => {
+const handleNewUpdate = () => {
     // Store current project in localStorage for the update form
-    localStorage.setItem('lastSelectedProject', project.Id.toString())
-    navigate('/new-update')
-  }
+    localStorage.setItem('lastSelectedProject', project.Id.toString());
+    navigate('/new-update');
+  };
   
-  const handleGenerateReport = () => {
-    setShowReportPreview(true)
-  }
-  if (loading) return <Loading />
-  if (error) return <Error message={error} onRetry={loadProjectData} />
-  if (!project) return <Error message="Project not found" />
+const handleGenerateReport = () => {
+    setShowReportPreview(true);
+  };
+if (loading) return <Loading />;
+  if (error) return <Error message={error} onRetry={loadProjectData} />;
+  if (!project) return <Error message="Project not found" />;
   
   return (
     <div className="min-h-screen bg-gray-50">
@@ -164,13 +181,13 @@ const getStatusVariant = (status) => {
           </div>
           
           <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-            <div className="flex items-center">
+<div className="flex items-center">
               <ApperIcon name="Calendar" className="w-4 h-4 mr-1" />
-              Started {format(new Date(project.startDate), 'MMM d, yyyy')}
+              Started {project?.startDate ? format(new Date(project.startDate), 'MMM d, yyyy') : 'Not set'}
             </div>
             <div className="flex items-center">
               <ApperIcon name="Target" className="w-4 h-4 mr-1" />
-              Due {format(new Date(project.targetDate), 'MMM d, yyyy')}
+              Due {project?.targetDate ? format(new Date(project.targetDate), 'MMM d, yyyy') : 'Not set'}
             </div>
           </div>
         </div>
@@ -187,7 +204,7 @@ const getStatusVariant = (status) => {
                 Access Instructions
               </h2>
               {!editingAccessInstructions ? (
-                <Button
+<Button
                   variant="outline"
                   size="sm"
                   icon="Edit"
@@ -239,17 +256,19 @@ const getStatusVariant = (status) => {
               Project Updates
             </h2>
 <div className="flex gap-3">
-              <Button
+<Button
                 variant="primary"
                 icon="Camera"
                 onClick={handleNewUpdate}
+                disabled={!project}
               >
                 📷 Take Photos
               </Button>
-              <Button
+<Button
                 variant="outline"
                 icon="FileText"
                 onClick={handleGenerateReport}
+                disabled={!project}
               >
                 Generate Report
               </Button>
@@ -262,7 +281,7 @@ const getStatusVariant = (status) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
           >
-            {updates.length === 0 ? (
+{updates?.length === 0 ? (
               <Empty
                 icon="Camera"
                 title="No Updates Yet"
@@ -301,7 +320,7 @@ const getStatusVariant = (status) => {
         />
       )}
     </div>
-  )
-}
+);
+};
 
-export default ProjectDetailsPage
+export default ProjectDetailsPage;
