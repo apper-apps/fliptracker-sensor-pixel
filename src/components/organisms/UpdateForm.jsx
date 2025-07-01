@@ -137,10 +137,9 @@ const updateData = {
         <label className="block text-sm font-semibold text-gray-700 mb-2">
           Photos <span className="text-red-500">*</span>
         </label>
-        <PhotoUpload
+<PhotoUpload
           photos={photos}
           onPhotosChange={setPhotos}
-          maxPhotos={10}
         />
       </div>
       

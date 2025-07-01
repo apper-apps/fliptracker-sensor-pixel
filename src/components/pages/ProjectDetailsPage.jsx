@@ -183,9 +183,9 @@ if (loading) return <Loading />;
               <ApperIcon name="Calendar" className="w-4 h-4 mr-1" />
               Started {project?.startDate ? format(new Date(project.startDate), 'MMM d, yyyy') : 'Not set'}
             </div>
-            <div className="flex items-center">
+<div className="flex items-center">
               <ApperIcon name="Target" className="w-4 h-4 mr-1" />
-              Due {project?.targetDate ? format(new Date(project.targetDate), 'MMM d, yyyy') : 'Not set'}
+              Target {project?.targetDate ? format(new Date(project.targetDate), 'MMM d, yyyy') : 'Not set'}
             </div>
           </div>
         </div>

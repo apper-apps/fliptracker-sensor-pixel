@@ -4,17 +4,12 @@ import Button from '@/components/atoms/Button'
 import ApperIcon from '@/components/ApperIcon'
 import { toast } from 'react-toastify'
 
-const PhotoUpload = ({ onPhotosChange, photos = [], maxPhotos = 10 }) => {
+const PhotoUpload = ({ onPhotosChange, photos = [] }) => {
   const fileInputRef = useRef(null)
   const [isDragging, setIsDragging] = useState(false)
   
   const handleFileSelect = (files) => {
     const fileArray = Array.from(files)
-    
-    if (photos.length + fileArray.length > maxPhotos) {
-      toast.error(`Maximum ${maxPhotos} photos allowed`)
-      return
-    }
     
     const newPhotos = fileArray.map(file => ({
       id: Date.now() + Math.random(),
@@ -103,7 +98,7 @@ const PhotoUpload = ({ onPhotosChange, photos = [], maxPhotos = 10 }) => {
             Or drag and drop photos here • Capture progress instantly
           </p>
           <p className="text-xs text-gray-400">
-            {photos.length}/{maxPhotos} photos added
+            {photos.length} photos added
           </p>
         </div>
       </div>
