@@ -25,12 +25,14 @@ const ProjectSelector = ({ selectedProject, onProjectSelect, className = '' }) =
     }
   }
   
-  const getStatusVariant = (status) => {
+const getStatusVariant = (status) => {
     const statusMap = {
-      'Demo': 'demo',
-      'Framing': 'framing', 
-      'Finishing': 'finishing',
-      'Completed': 'completed'
+      'Planning & Permits': 'planning',
+      'Demo & Structural': 'demo',
+      'Systems & Rough-In': 'systems',
+      'Finishes & Final': 'finishing',
+      'On-Market': 'market',
+      'Sold': 'completed'
     }
     return statusMap[status] || 'default'
   }

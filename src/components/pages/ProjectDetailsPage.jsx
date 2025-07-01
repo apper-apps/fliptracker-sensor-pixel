@@ -56,14 +56,35 @@ const ProjectDetailsPage = () => {
     }
   }
   
-  const getStatusVariant = (status) => {
+const getStatusVariant = (status) => {
     const statusMap = {
-      'Demo': 'demo',
-      'Framing': 'framing',
-      'Finishing': 'finishing',
-      'Completed': 'completed'
+      'Planning & Permits': 'planning',
+      'Demo & Structural': 'demo',
+      'Systems & Rough-In': 'systems',
+      'Finishes & Final': 'finishing',
+      'On-Market': 'market',
+      'Sold': 'completed'
     }
     return statusMap[status] || 'default'
+  }
+
+  const statusOptions = [
+    'Planning & Permits',
+    'Demo & Structural', 
+    'Systems & Rough-In',
+    'Finishes & Final',
+    'On-Market',
+    'Sold'
+  ]
+
+  const handleStatusChange = async (newStatus) => {
+    try {
+      const updatedProject = await projectService.update(project.Id, { status: newStatus })
+      setProject(updatedProject)
+      toast.success('Project status updated successfully')
+    } catch (error) {
+      toast.error('Failed to update project status')
+    }
   }
   
 const handleNewUpdate = () => {
@@ -91,7 +112,7 @@ const handleNewUpdate = () => {
             >
               <ApperIcon name="ArrowLeft" className="w-5 h-5 text-gray-600" />
             </button>
-            <div className="flex-1">
+<div className="flex-1">
               <div className="flex items-center gap-3 mb-2">
                 <Badge variant={getStatusVariant(project.status)}>
                   {project.status}
@@ -106,6 +127,24 @@ const handleNewUpdate = () => {
               <p className="text-gray-600">
                 {project.propertyType}
               </p>
+              
+              {/* Status Dropdown */}
+              <div className="mt-3">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Project Status
+                </label>
+                <select
+                  value={project.status}
+                  onChange={(e) => handleStatusChange(e.target.value)}
+                  className="block w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+                >
+                  {statusOptions.map((status) => (
+                    <option key={status} value={status}>
+                      {status}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
           
@@ -130,20 +169,20 @@ const handleNewUpdate = () => {
             <h2 className="text-lg font-semibold text-gray-900">
               Project Updates
             </h2>
-            <div className="flex gap-3">
-              <Button
-                variant="outline"
-                icon="FileText"
-                onClick={handleGenerateReport}
-              >
-                Generate Report
-              </Button>
+<div className="flex gap-3">
               <Button
                 variant="primary"
                 icon="Camera"
                 onClick={handleNewUpdate}
               >
                 📷 Take Photos
+              </Button>
+              <Button
+                variant="outline"
+                icon="FileText"
+                onClick={handleGenerateReport}
+              >
+                Generate Report
               </Button>
             </div>
           </div>

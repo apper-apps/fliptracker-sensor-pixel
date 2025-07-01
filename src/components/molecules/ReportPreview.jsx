@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import Button from '@/components/atoms/Button'
-import Badge from '@/components/atoms/Badge'
-import Loading from '@/components/ui/Loading'
-import Error from '@/components/ui/Error'
-import ApperIcon from '@/components/ApperIcon'
-import { reportService } from '@/services/api/reportService'
-import { toast } from 'react-toastify'
+import React, { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { toast } from "react-toastify";
+import ApperIcon from "@/components/ApperIcon";
+import Badge from "@/components/atoms/Badge";
+import Button from "@/components/atoms/Button";
+import Error from "@/components/ui/Error";
+import Loading from "@/components/ui/Loading";
+import { reportService } from "@/services/api/reportService";
 
 const ReportPreview = ({ project, updates, onClose }) => {
   const [reportData, setReportData] = useState(null)
@@ -31,7 +31,7 @@ const ReportPreview = ({ project, updates, onClose }) => {
     }
   }
 
-  const handleDownload = async () => {
+const handleDownload = async () => {
     setGenerating(true)
     try {
       // Create a simple text-based report for download
@@ -52,6 +52,51 @@ const ReportPreview = ({ project, updates, onClose }) => {
       toast.error('Failed to download report')
     } finally {
       setGenerating(false)
+    }
+  }
+
+const handleShare = async () => {
+    try {
+      const reportContent = generateTextReport(reportData)
+      
+      if (navigator.share && typeof File !== 'undefined') {
+        try {
+          await navigator.share({
+            title: `Project Report - ${project.address}`,
+            text: reportContent,
+            files: [new File([reportContent], `${project.address.replace(/[^a-z0-9]/gi, '_')}_Report.txt`, {
+              type: 'text/plain'
+            })]
+          })
+          toast.success('Report shared successfully')
+        } catch (shareErr) {
+          // If file sharing fails, try sharing without files
+          if (navigator.share && shareErr.name !== 'AbortError') {
+            await navigator.share({
+              title: `Project Report - ${project.address}`,
+              text: reportContent
+            })
+            toast.success('Report shared successfully')
+          } else {
+            throw shareErr
+          }
+        }
+      } else if (navigator.share) {
+        // Share without files if File constructor is not available
+        await navigator.share({
+          title: `Project Report - ${project.address}`,
+          text: reportContent
+        })
+        toast.success('Report shared successfully')
+      } else {
+        // Fallback: copy to clipboard
+        await navigator.clipboard.writeText(reportContent)
+        toast.success('Report copied to clipboard')
+      }
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        toast.error('Failed to share report')
+      }
     }
   }
 
@@ -205,13 +250,21 @@ const ReportPreview = ({ project, updates, onClose }) => {
             <div className="text-sm text-gray-600">
               {reportData && `Generated on ${reportData.generatedAt}`}
             </div>
-            <div className="flex gap-3">
+<div className="flex gap-3">
               <Button
                 variant="outline"
                 onClick={onClose}
                 disabled={generating}
               >
                 Cancel
+              </Button>
+              <Button
+                variant="outline"
+                icon="Share"
+                onClick={handleShare}
+                disabled={!reportData}
+              >
+                Share Report
               </Button>
               <Button
                 variant="primary"
