@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { AlertCircle, Camera, FileImage, RotateCcw, Upload, X } from "lucide-react";
-import { CameraPro } from "react-camera-pro";
-import usePermissions from "@/hooks/usePermissions";
+import { Camera as CameraPro } from "react-camera-pro";
 import { toast } from "react-toastify";
 import { compressImage } from "@/utils/imageUtils";
 import Button from "@/components/atoms/Button";
 import Error from "@/components/ui/Error";
+import usePermissions from "@/hooks/usePermissions";
 
 const PhotoUpload = ({ onPhotoTaken, onPhotoRemoved, existingPhoto, className = '' }) => {
   const [showCamera, setShowCamera] = useState(false);
