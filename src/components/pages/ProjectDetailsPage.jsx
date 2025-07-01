@@ -19,9 +19,12 @@ const ProjectDetailsPage = () => {
   const navigate = useNavigate()
   const [project, setProject] = useState(null)
   const [updates, setUpdates] = useState([])
-  const [loading, setLoading] = useState(true)
+const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [showReportPreview, setShowReportPreview] = useState(false)
+  const [editingAccessInstructions, setEditingAccessInstructions] = useState(false)
+  const [accessInstructions, setAccessInstructions] = useState('')
+  
   useEffect(() => {
     loadProjectData()
   }, [id])
@@ -33,9 +36,10 @@ const ProjectDetailsPage = () => {
       const [projectData, updatesData] = await Promise.all([
         projectService.getById(parseInt(id)),
         updateService.getAll()
-      ])
+])
       
       setProject(projectData)
+      setAccessInstructions(projectData.accessInstructions || '')
       // Filter updates for this project
       const projectUpdates = updatesData.filter(update => update.projectId === projectData.Id)
       setUpdates(projectUpdates)
@@ -85,9 +89,20 @@ const getStatusVariant = (status) => {
     } catch (error) {
       toast.error('Failed to update project status')
     }
+}
+
+  const handleAccessInstructionsUpdate = async () => {
+    try {
+      const updatedProject = await projectService.update(project.Id, { accessInstructions })
+      setProject(updatedProject)
+      setEditingAccessInstructions(false)
+      toast.success('Access instructions updated successfully')
+    } catch (error) {
+      toast.error('Failed to update access instructions')
+    }
   }
   
-const handleNewUpdate = () => {
+  const handleNewUpdate = () => {
     // Store current project in localStorage for the update form
     localStorage.setItem('lastSelectedProject', project.Id.toString())
     navigate('/new-update')
@@ -161,10 +176,64 @@ const handleNewUpdate = () => {
         </div>
       </div>
       
-      {/* Content */}
+{/* Content */}
       <div className="px-4 sm:px-6 lg:px-8 py-8">
         <div className="max-w-4xl mx-auto">
-{/* Action Bar */}
+          {/* Access Instructions Section */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                <ApperIcon name="Key" className="w-5 h-5 mr-2 text-gray-600" />
+                Access Instructions
+              </h2>
+              {!editingAccessInstructions ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  icon="Edit"
+                  onClick={() => setEditingAccessInstructions(true)}
+                >
+                  Edit
+                </Button>
+              ) : (
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setEditingAccessInstructions(false)
+                      setAccessInstructions(project.accessInstructions || '')
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={handleAccessInstructionsUpdate}
+                  >
+                    Save
+                  </Button>
+                </div>
+              )}
+            </div>
+            
+            {!editingAccessInstructions ? (
+              <div className="text-gray-700 whitespace-pre-wrap">
+                {project.accessInstructions || 'No access instructions provided yet.'}
+              </div>
+            ) : (
+              <textarea
+                value={accessInstructions}
+                onChange={(e) => setAccessInstructions(e.target.value)}
+                placeholder="Enter access instructions including lockbox codes, entry procedures, contact information, etc."
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary resize-vertical"
+                rows="6"
+              />
+            )}
+          </div>
+          
+          {/* Action Bar */}
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-lg font-semibold text-gray-900">
               Project Updates
