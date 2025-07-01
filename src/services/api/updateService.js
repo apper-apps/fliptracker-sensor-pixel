@@ -19,11 +19,13 @@ export const updateService = {
     return { ...update }
   },
   
-  async create(updateData) {
+async create(updateData) {
     await delay(500)
     const newUpdate = {
       Id: Math.max(...mockUpdates.map(u => u.Id)) + 1,
       ...updateData,
+      // Support both 'photos' and 'media' fields for backward compatibility
+      photos: updateData.photos || updateData.media || [],
       timestamp: new Date().toISOString()
     }
     mockUpdates.push(newUpdate)

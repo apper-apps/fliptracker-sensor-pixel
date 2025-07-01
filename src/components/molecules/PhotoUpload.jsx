@@ -221,12 +221,24 @@ return (
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.2 }}
             >
-              <div className="relative">
-                <img
-                  src={photo.url}
-                  alt="Upload preview"
-                  className="w-full h-32 object-cover"
-                />
+<div className="relative">
+                {photo.type === 'video' ? (
+                  <video
+                    src={photo.url}
+                    className="w-full h-32 object-cover"
+                    controls
+                    muted
+                  />
+                ) : (
+                  <img
+                    src={photo.url}
+                    alt="Upload preview"
+                    className="w-full h-32 object-cover"
+                  />
+                )}
+                <div className="absolute top-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs">
+                  {photo.type === 'video' ? '🎥' : '📷'}
+                </div>
                 <button
                   onClick={() => removePhoto(photo.id)}
                   className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
