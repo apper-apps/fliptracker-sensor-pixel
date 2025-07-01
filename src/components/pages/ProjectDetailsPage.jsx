@@ -9,6 +9,7 @@ import Loading from '@/components/ui/Loading'
 import Error from '@/components/ui/Error'
 import Empty from '@/components/ui/Empty'
 import ApperIcon from '@/components/ApperIcon'
+import ReportPreview from '@/components/molecules/ReportPreview'
 import { projectService } from '@/services/api/projectService'
 import { updateService } from '@/services/api/updateService'
 import { toast } from 'react-toastify'
@@ -20,7 +21,7 @@ const ProjectDetailsPage = () => {
   const [updates, setUpdates] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  
+  const [showReportPreview, setShowReportPreview] = useState(false)
   useEffect(() => {
     loadProjectData()
   }, [id])
@@ -65,12 +66,15 @@ const ProjectDetailsPage = () => {
     return statusMap[status] || 'default'
   }
   
-  const handleNewUpdate = () => {
+const handleNewUpdate = () => {
     // Store current project in localStorage for the update form
     localStorage.setItem('lastSelectedProject', project.Id.toString())
     navigate('/new-update')
   }
   
+  const handleGenerateReport = () => {
+    setShowReportPreview(true)
+  }
   if (loading) return <Loading />
   if (error) return <Error message={error} onRetry={loadProjectData} />
   if (!project) return <Error message="Project not found" />
@@ -121,18 +125,27 @@ const ProjectDetailsPage = () => {
       {/* Content */}
       <div className="px-4 sm:px-6 lg:px-8 py-8">
         <div className="max-w-4xl mx-auto">
-          {/* Action Bar */}
+{/* Action Bar */}
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-lg font-semibold text-gray-900">
               Project Updates
             </h2>
-<Button
-              variant="primary"
-              icon="Camera"
-              onClick={handleNewUpdate}
-            >
-              📷 Take Photos
-            </Button>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                icon="FileText"
+                onClick={handleGenerateReport}
+              >
+                Generate Report
+              </Button>
+              <Button
+                variant="primary"
+                icon="Camera"
+                onClick={handleNewUpdate}
+              >
+                📷 Take Photos
+              </Button>
+            </div>
           </div>
           
           {/* Updates Feed */}
@@ -167,9 +180,18 @@ const ProjectDetailsPage = () => {
                 ))}
               </div>
             )}
-          </motion.div>
+</motion.div>
         </div>
       </div>
+      
+      {/* Report Preview Modal */}
+      {showReportPreview && (
+        <ReportPreview
+          project={project}
+          updates={updates}
+          onClose={() => setShowReportPreview(false)}
+        />
+      )}
     </div>
   )
 }
